@@ -20,13 +20,11 @@ import * as controller from './auth.controller.js'
 import {
   ChangePasswordSchema,
   DetailSchema,
-  ForgotPasswordSchema,
   LoginSchema,
   LogoutSchema,
   PatchedUserSchema,
   RefreshSchema,
   RegisterSchema,
-  ResetPasswordSchema,
   TokenSchema,
   UserSchema,
 } from './auth.schemas.js'
@@ -112,42 +110,6 @@ authRouter.post(
   authenticate,
   validateBody(ChangePasswordSchema),
   controller.changePassword
-)
-
-// ── POST /api/auth/forgot-password/ ────────────────────────────────────
-registry.registerPath({
-  method: 'post',
-  path: '/api/auth/forgot-password/',
-  operationId: 'auth_forgot_password_create',
-  tags: TAGS,
-  description: 'Request a password reset email.',
-  request: { body: jsonContent(ForgotPasswordSchema) },
-  responses: {
-    200: { description: 'Reset email queued.', ...jsonContent(DetailSchema) },
-  },
-})
-authRouter.post(
-  '/forgot-password/',
-  validateBody(ForgotPasswordSchema),
-  controller.forgotPassword
-)
-
-// ── POST /api/auth/reset-password/ ─────────────────────────────────────
-registry.registerPath({
-  method: 'post',
-  path: '/api/auth/reset-password/',
-  operationId: 'auth_reset_password_create',
-  tags: TAGS,
-  description: 'Reset password using a token from the reset email.',
-  request: { body: jsonContent(ResetPasswordSchema) },
-  responses: {
-    200: { description: 'Password reset.', ...jsonContent(DetailSchema) },
-  },
-})
-authRouter.post(
-  '/reset-password/',
-  validateBody(ResetPasswordSchema),
-  controller.resetPassword
 )
 
 // ── POST /api/auth/logout/ ─────────────────────────────────────────────

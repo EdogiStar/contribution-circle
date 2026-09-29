@@ -10,12 +10,21 @@
 import { z } from '../../config/zod.js'
 
 /** Mirrors Django's `AUTH_PASSWORD_VALIDATORS` minimum length. */
-const password = z.string().min(8, 'This password is too short. It must contain at least 8 characters.')
+const password = z
+  .string()
+  .min(8, 'This password is too short. It must contain at least 8 characters.')
+
+/** Email addresses are case-insensitive for account identity. */
+const email = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .email('Enter a valid email address.')
 
 export const UserSchema = z
   .object({
     id: z.number().int(),
-    email: z.string().email('Enter a valid email address.'),
+    email,
     first_name: z.string(),
     last_name: z.string(),
     date_joined: z.string().datetime(),
@@ -37,14 +46,14 @@ export const DetailSchema = z
 
 export const LoginSchema = z
   .object({
-    email: z.string().email('Enter a valid email address.'),
+    email,
     password: z.string().min(1, 'This field may not be blank.'),
   })
   .openapi('Login')
 
 export const RegisterSchema = z
   .object({
-    email: z.string().email('Enter a valid email address.'),
+    email,
     first_name: z.string().min(1, 'This field may not be blank.'),
     last_name: z.string().default(''),
     password,
@@ -70,24 +79,6 @@ export const ChangePasswordSchema = z
   })
   .openapi('ChangePassword')
 
-export const ForgotPasswordSchema = z
-  .object({
-    email: z.string().email('Enter a valid email address.'),
-  })
-  .openapi('ForgotPassword')
-
-export const ResetPasswordSchema = z
-  .object({
-    token: z.string().min(1, 'This field may not be blank.'),
-    password,
-    password_confirm: z.string(),
-  })
-  .refine((data) => data.password === data.password_confirm, {
-    message: 'Passwords do not match.',
-    path: ['password_confirm'],
-  })
-  .openapi('ResetPassword')
-
 export const RefreshSchema = z
   .object({
     refresh: z.string().min(1, 'This field may not be blank.'),
@@ -104,5 +95,4 @@ export type LoginInput = z.infer<typeof LoginSchema>
 export type RegisterInput = z.infer<typeof RegisterSchema>
 export type PatchedUserInput = z.infer<typeof PatchedUserSchema>
 export type ChangePasswordInput = z.infer<typeof ChangePasswordSchema>
-export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>
 export type UserOutput = z.infer<typeof UserSchema>

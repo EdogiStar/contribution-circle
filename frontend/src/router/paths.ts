@@ -11,8 +11,6 @@ export enum Path {
   Home = '/',
   Login = '/login',
   Register = '/register',
-  ForgotPassword = '/forgot-password',
-  ResetPassword = '/reset-password/:token',
   Dashboard = '/dashboard',
   // blacksmith:path
 }
@@ -21,18 +19,20 @@ export enum Path {
  * Build a path with dynamic parameters replaced.
  *
  * @example
- *   buildPath(Path.ResetPassword, { token: 'abc123' })
- *   // => '/reset-password/abc123'
+ *   buildPath(Path.Dashboard)
+ *   // => '/dashboard'
  */
 export function buildPath(
   path: Path,
   params?: Record<string, string>,
 ): string {
   let result: string = path
+
   if (params) {
     for (const [key, value] of Object.entries(params)) {
       result = result.replace(`:${key}`, encodeURIComponent(value))
     }
   }
+
   return result
 }

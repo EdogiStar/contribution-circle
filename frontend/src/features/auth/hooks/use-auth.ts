@@ -20,7 +20,5 @@ export function useAuth() {
     login: auth.signInWithEmail,
     register: auth.signUpWithEmail,
     logout: auth.signOut,
-    sendPasswordResetEmail: auth.sendPasswordResetEmail,
-    confirmPasswordReset: auth.confirmPasswordReset,
   }
 }

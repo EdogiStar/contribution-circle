@@ -5,19 +5,15 @@ describe('buildPath', () => {
     expect(buildPath(Path.Dashboard)).toBe('/dashboard')
   })
 
-  it('substitutes a named parameter', () => {
-    expect(buildPath(Path.ResetPassword, { token: 'abc123' })).toBe(
-      '/reset-password/abc123'
-    )
+  it('returns the home path unchanged', () => {
+    expect(buildPath(Path.Home)).toBe('/')
   })
 
-  it('encodes parameter values', () => {
-    expect(buildPath(Path.ResetPassword, { token: 'a b/c' })).toBe(
-      '/reset-password/a%20b%2Fc'
-    )
+  it('returns the login path unchanged', () => {
+    expect(buildPath(Path.Login)).toBe('/login')
   })
 
-  it('leaves unmatched placeholders alone', () => {
-    expect(buildPath(Path.ResetPassword, { other: 'x' })).toBe('/reset-password/:token')
+  it('returns the register path unchanged', () => {
+    expect(buildPath(Path.Register)).toBe('/register')
   })
 })
