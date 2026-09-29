@@ -35,8 +35,16 @@ export default function setup(): void {
     fs.rmSync(`${dbFile}-journal`, { force: true })
   }
 
-  execFileSync('npx', ['prisma', 'db', 'push', '--skip-generate'], {
+  execFileSync(
+  process.execPath,
+  [path.resolve('node_modules/prisma/build/index.js'), 'db', 'push', '--skip-generate'],
+  {
     stdio: 'inherit',
     env: { ...process.env, DATABASE_URL },
-  })
+  },
+)
+  // execFileSync(path.resolve('node_modules/.bin/prisma.cmd'), ['db', 'push', '--skip-generate'], {
+  //   stdio: 'inherit',
+  //   env: { ...process.env, DATABASE_URL },
+  // })
 }

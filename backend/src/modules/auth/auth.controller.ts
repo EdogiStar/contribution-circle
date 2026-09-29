@@ -32,17 +32,38 @@ export async function changePassword(req: Request, res: Response): Promise<void>
   res.json({ detail: 'Password changed successfully.' })
 }
 
-export async function forgotPassword(_req: Request, res: Response): Promise<void> {
-  // TODO: Implement email sending logic.
-  // Always reports success so the endpoint cannot be used to discover which
-  // email addresses have accounts.
-  res.json({ detail: 'If an account exists, a reset email has been sent.' })
+
+export async function forgotPassword(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const result = await authService.forgotPassword(req.body.email)
+
+  const response: {
+    detail: string
+    reset_token?: string
+  } = {
+    detail: 'If an account exists, a reset email has been sent.',
+  }
+
+  if (result.resetToken) {
+    response.reset_token = result.resetToken
+  }
+
+  res.json(response)
 }
 
-export async function resetPassword(_req: Request, res: Response): Promise<void> {
-  // TODO: Implement token verification and password reset.
-  res.json({ detail: 'Password has been reset successfully.' })
+export async function resetPassword(
+  req: Request,
+  res: Response
+): Promise<void> {
+  await authService.resetPassword(req.body)
+
+  res.json({
+    detail: 'Password has been reset successfully.',
+  })
 }
+
 
 export async function logout(_req: Request, res: Response): Promise<void> {
   // Tokens are stateless. Add a revocation list here if you need refresh

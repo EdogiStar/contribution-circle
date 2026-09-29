@@ -1,3 +1,4 @@
+
 /**
  * Auth Provider
  *
@@ -17,10 +18,18 @@ interface AuthContextValue {
   loading: boolean
   error: AuthError | null
   signInWithEmail: (email: string, password: string) => Promise<AuthResult>
-  signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<AuthResult>
+  signUpWithEmail: (
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string
+  ) => Promise<AuthResult>
   signOut: () => Promise<void>
   sendPasswordResetEmail: (email: string) => Promise<{ success: boolean; error?: AuthError }>
-  confirmPasswordReset: (code: string, newPassword: string) => Promise<{ success: boolean; error?: AuthError }>
+  confirmPasswordReset: (
+    code: string,
+    newPassword: string
+  ) => Promise<{ success: boolean; error?: AuthError }>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -41,26 +50,49 @@ export function AuthProvider({ children }: Props) {
       setUser(u)
       setLoading(false)
     })
+
     return unsubscribe
   }, [])
 
-  const signInWithEmail = useCallback(async (email: string, password: string) => {
-    setError(null)
-    const result = await adapter.signInWithEmail(email, password)
-    if (!result.success && result.error) {
-      setError(result.error)
-    }
-    return result
-  }, [])
+  const signInWithEmail = useCallback(
+    async (email: string, password: string) => {
+      setError(null)
 
-  const signUpWithEmail = useCallback(async (email: string, password: string, displayName?: string) => {
-    setError(null)
-    const result = await adapter.signUpWithEmail(email, password, displayName)
-    if (!result.success && result.error) {
-      setError(result.error)
-    }
-    return result
-  }, [])
+      const result = await adapter.signInWithEmail(email, password)
+
+      if (!result.success && result.error) {
+        setError(result.error)
+      }
+
+      return result
+    },
+    []
+  )
+
+  const signUpWithEmail = useCallback(
+    async (
+      email: string,
+      password: string,
+      firstName: string,
+      lastName: string
+    ) => {
+      setError(null)
+
+      const result = await adapter.signUpWithEmail(
+        email,
+        password,
+        firstName,
+        lastName
+      )
+
+      if (!result.success && result.error) {
+        setError(result.error)
+      }
+
+      return result
+    },
+    []
+  )
 
   const signOut = useCallback(async () => {
     setError(null)
@@ -69,21 +101,30 @@ export function AuthProvider({ children }: Props) {
 
   const sendPasswordResetEmail = useCallback(async (email: string) => {
     setError(null)
+
     const result = await adapter.sendPasswordResetEmail(email)
+
     if (!result.success && result.error) {
       setError(result.error)
     }
+
     return result
   }, [])
 
-  const confirmPasswordReset = useCallback(async (code: string, newPassword: string) => {
-    setError(null)
-    const result = await adapter.confirmPasswordReset(code, newPassword)
-    if (!result.success && result.error) {
-      setError(result.error)
-    }
-    return result
-  }, [])
+  const confirmPasswordReset = useCallback(
+    async (code: string, newPassword: string) => {
+      setError(null)
+
+      const result = await adapter.confirmPasswordReset(code, newPassword)
+
+      if (!result.success && result.error) {
+        setError(result.error)
+      }
+
+      return result
+    },
+    []
+  )
 
   return (
     <AuthContext.Provider
@@ -105,8 +146,11 @@ export function AuthProvider({ children }: Props) {
 
 export function useAuthContext() {
   const context = useContext(AuthContext)
+
   if (!context) {
     throw new Error('useAuthContext must be used within an AuthProvider')
   }
+
   return context
 }
+
