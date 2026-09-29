@@ -207,13 +207,3 @@ describe('POST /api/auth/refresh/', () => {
   })
 })
 
-describe('POST /api/auth/forgot-password/', () => {
-  it('reports success for an unknown email, to avoid enumeration', async () => {
-    const response = await api()
-      .post('/api/auth/forgot-password/')
-      .send({ email: 'nobody@example.com' })
-
-    expect(response.status).toBe(200)
-    expect(response.body.detail).toBeDefined()
-  })
-})

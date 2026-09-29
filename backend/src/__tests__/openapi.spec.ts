@@ -20,8 +20,6 @@ describe('OpenAPI document', () => {
       '/api/auth/register/',
       '/api/auth/me/',
       '/api/auth/change-password/',
-      '/api/auth/forgot-password/',
-      '/api/auth/reset-password/',
       '/api/auth/logout/',
       '/api/auth/refresh/',
     ]) {

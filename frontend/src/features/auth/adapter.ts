@@ -173,49 +173,8 @@ export function createAuthAdapter(): AuthAdapter {
         success: false,
         error: {
           code: 'auth/unsupported',
-          message:
-            'Social login is not yet configured.',
+          message: 'Social login is not yet configured.',
         },
-      }
-    },
-
-    async sendPasswordResetEmail(email: string) {
-      try {
-        await apiFetch('/api/auth/forgot-password/', {
-          method: 'POST',
-          body: JSON.stringify({ email }),
-        })
-
-        return {
-          success: true as const,
-        }
-      } catch (error: unknown) {
-        return {
-          success: false as const,
-          error: toAuthError(error),
-        }
-      }
-    },
-
-    async confirmPasswordReset(code: string, newPassword: string) {
-      try {
-        await apiFetch('/api/auth/reset-password/', {
-          method: 'POST',
-          body: JSON.stringify({
-            token: code,
-            password: newPassword,
-            password_confirm: newPassword,
-          }),
-        })
-
-        return {
-          success: true as const,
-        }
-      } catch (error: unknown) {
-        return {
-          success: false as const,
-          error: toAuthError(error),
-        }
       }
     },
 

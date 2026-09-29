@@ -17,15 +17,61 @@ export const client = createClient({
   baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000',
 })
 
-// In-memory token storage (more secure than localStorage)
+const AUTH_STORAGE_KEY = 'contribution-circle-auth'
+
+// Persist tokens so a signed-in session survives a page reload.
 let accessToken: string | null = null
 let refreshToken: string | null = null
 
+function loadStoredTokens() {
+  try {
+    const stored = localStorage.getItem(AUTH_STORAGE_KEY)
+
+    if (!stored) return
+
+    const parsed = JSON.parse(stored)
+
+    accessToken =
+      typeof parsed.accessToken === 'string'
+        ? parsed.accessToken
+        : null
+
+    refreshToken =
+      typeof parsed.refreshToken === 'string'
+        ? parsed.refreshToken
+        : null
+  } catch {
+    localStorage.removeItem(AUTH_STORAGE_KEY)
+    accessToken = null
+    refreshToken = null
+  }
+}
+
+function persistTokens() {
+  if (!accessToken && !refreshToken) {
+    localStorage.removeItem(AUTH_STORAGE_KEY)
+    return
+  }
+
+  localStorage.setItem(
+    AUTH_STORAGE_KEY,
+    JSON.stringify({
+      accessToken,
+      refreshToken,
+    })
+  )
+}
+
+loadStoredTokens()
+
 export function setTokens(access: string | null, refresh?: string | null) {
   accessToken = access
+
   if (refresh !== undefined) {
     refreshToken = refresh
   }
+
+  persistTokens()
 }
 
 export function getAccessToken(): string | null {
@@ -39,6 +85,7 @@ export function getRefreshToken(): string | null {
 export function clearTokens() {
   accessToken = null
   refreshToken = null
+  persistTokens()
 }
 
 // Auth interceptor — attach JWT to every request
@@ -46,6 +93,7 @@ client.interceptors.request.use((request) => {
   if (accessToken) {
     request.headers.set('Authorization', `Bearer ${accessToken}`)
   }
+
   return request
 })
 
@@ -59,6 +107,7 @@ client.interceptors.request.use((request) => {
   if (csrfToken) {
     request.headers.set('X-CSRFToken', csrfToken)
   }
+
   return request
 })
 
@@ -82,7 +131,9 @@ async function attemptTokenRefresh(): Promise<boolean> {
     if (!response.ok) return false
 
     const data = await response.json()
+
     setTokens(data.access, data.refresh)
+
     return true
   } catch {
     return false
@@ -90,9 +141,13 @@ async function attemptTokenRefresh(): Promise<boolean> {
 }
 
 client.interceptors.response.use(async (response) => {
-  if (response.status === 401 && !response.url.includes('/api/auth/refresh/')) {
+  if (
+    response.status === 401 &&
+    !response.url.includes('/api/auth/refresh/')
+  ) {
     if (!isRefreshing) {
       isRefreshing = true
+
       refreshPromise = attemptTokenRefresh().finally(() => {
         isRefreshing = false
         refreshPromise = null
@@ -100,11 +155,12 @@ client.interceptors.response.use(async (response) => {
     }
 
     const refreshed = await refreshPromise
+
     if (!refreshed) {
       clearTokens()
       window.dispatchEvent(new CustomEvent('auth:logout'))
     }
   }
+
   return response
 })
-

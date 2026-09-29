@@ -36,7 +36,9 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
     const result = await login(email, password)
+
     if (result.success) {
       navigate(redirectTo, { replace: true })
     }
@@ -46,7 +48,9 @@ export default function LoginPage() {
     <Box>
       <VStack spacing={2} mb={6} align="start">
         <Heading size="lg">Sign In</Heading>
-        <Text color="gray.500">Enter your credentials to access your account.</Text>
+        <Text color="gray.500">
+          Enter your credentials to access your account.
+        </Text>
       </VStack>
 
       {error && (
@@ -90,16 +94,12 @@ export default function LoginPage() {
       </form>
 
       <VStack spacing={2} mt={6}>
-        <ChakraLink
-          color="blue.500"
-          fontSize="sm"
-          onClick={() => navigate(Path.ForgotPassword)}
-        >
-          Forgot your password?
-        </ChakraLink>
         <Text fontSize="sm" color="gray.500">
           Don't have an account?{' '}
-          <ChakraLink color="blue.500" onClick={() => navigate(Path.Register)}>
+          <ChakraLink
+            color="blue.500"
+            onClick={() => navigate(Path.Register)}
+          >
             Sign Up
           </ChakraLink>
         </Text>

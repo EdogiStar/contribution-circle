@@ -22,13 +22,14 @@ export type SocialProvider = 'google' | 'github' | 'facebook' | 'apple'
 
 export interface AuthAdapter {
   signInWithEmail(email: string, password: string): Promise<AuthResult>
-  signUpWithEmail(email: string, password: string, firstName: string, lastName: string): Promise<AuthResult>
+  signUpWithEmail(
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string
+  ): Promise<AuthResult>
   signInWithSocial(provider: SocialProvider): Promise<AuthResult>
-  sendPasswordResetEmail(email: string): Promise<{ success: boolean; error?: AuthError }>
-  confirmPasswordReset(code: string, newPassword: string): Promise<{ success: boolean; error?: AuthError }>
   signOut(): Promise<void>
   getCurrentUser(): AuthUser | null
   onAuthStateChanged(callback: (user: AuthUser | null) => void): () => void
 }
-
-
